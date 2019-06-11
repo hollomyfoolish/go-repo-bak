@@ -1,0 +1,4 @@
+github.com/hollomyfoolish/go-repo v0.0.0-20190530051901-870e3a6e6c70 h1:S/pR9ag5U7AomFvbuzd4T8/fNLWcnnZNuAkR2BDqfNM=
+github.com/hollomyfoolish/go-repo v0.0.0-20190530051901-870e3a6e6c70/go.mod h1:HQQi3/6O1xHES+9/J46E4ApO7hvbztB8RLSi73/tCOU=
+github.com/satori/go.uuid v1.2.0 h1:0uYX9dsZ2yD7q2RtLRtPSdGDWzjeM3TbMJP9utgA0ww=
+github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
