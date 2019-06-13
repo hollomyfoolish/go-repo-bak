@@ -14,25 +14,68 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+const ARG_BASEFOLER = "baseFolder"
+const ARG_SRCURL = "srcUrl"
+const ARG_SRCLIST = "srcList"
+
 var picUrlKey = "var mhurl="
 var picHost = "http://p1.xiaoshidi.net/"
-var baseFolder = "C:/Users/i311688/Desktop/MyTemp/manga/hzw/"
+// var baseFolder = "C:/Users/i311688/Desktop/MyTemp/manga/hzw/"
+var baseFolder = "/Users/i311688/entertainment/manga/one_piece/"
 
 func main() {
+	args := parseArgs()
+
+	if _, ok := args[ARG_SRCURL]; ok {
+		downloadWithSrcUrl(args)
+	} else {
+		downloadWithList()
+	}
+}
+
+func downloadWithSrcUrl(args map[string]string) {
+	if bFolder, ok := args[ARG_BASEFOLER]; ok {
+		baseFolder = bFolder
+	}
+	url := args[ARG_SRCURL]
+	fmt.Printf("source URL is: %s \nbase folder is: %s\n", url, baseFolder)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Printf("source url %s not avaiable: %v\n", url, err)
+		return
+	}
+	
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		fmt.Printf("source url %s not avaiable: %v\n", url, err)
+		resp.Body.Close()
+		return
+	}
+	var urls []string
+	doc.Find("#content li").Each(func(i int, s *goquery.Selection) {
+		href, _ := s.Find("a").Attr("href")
+		urls = append(urls, fmt.Sprintf("%s%s", url, href))
+	})
+	downloadWithUrls(urls)
+}
+
+func downloadWithList() {
 	if len(os.Args) < 2 {
 		log.Fatal("file path of list required")
 	}
 	path := os.Args[1]
 	fmt.Printf("file path is: %s\n", path)
+	if len(os.Args) >= 3 {
+		baseFolder = os.Args[2]
+	}
+	fmt.Printf("destination folder is: %s\n", baseFolder)
 
 	file, err := os.Open(path)
     if err != nil {
         log.Fatal(err)
     }
-	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	var wg sync.WaitGroup
 	var urls []string
     for scanner.Scan() {
 		url := scanner.Text()
@@ -41,6 +84,13 @@ func main() {
 			urls = append(urls, url)
 		}
 	}
+	file.Close()
+	
+	downloadWithUrls(urls)
+}
+
+func downloadWithUrls(urls []string) {
+	var wg sync.WaitGroup
 	wg.Add(len(urls))
 	for _, url := range urls{
 		go download(url, &wg)
@@ -134,4 +184,20 @@ func downloadPic (picUrl string, folder string, picIdx int) {
 	} else {
 		fmt.Println("error")
 	}
+}
+
+func parseArgs() map[string]string {
+	args := make(map[string]string)
+
+	for _, arg := range os.Args {
+		idx := strings.Index(arg, "-D")
+		if idx == 0 { 
+			idx2 := strings.Index(arg, "=")
+			if idx2 >= 0 && idx2 < (len(arg) - 1){
+				args[arg[idx + 2:idx2]] = arg[idx2 + 1:]
+			}
+		}
+	}
+	fmt.Printf("args: %v\n", args)
+	return args
 }
