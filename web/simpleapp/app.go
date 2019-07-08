@@ -1,10 +1,10 @@
 package app
-
+/**
 import(
 	"net/http"
 	"log"
 )
-
+**/
 func Foo() string {
 	return "foo from app"
 }
