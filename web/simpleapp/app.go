@@ -1,4 +1,4 @@
-package main
+package app
 
 import(
 	"net/http"
@@ -8,7 +8,7 @@ import(
 func Foo() string {
 	return "foo from app"
 }
-
+/**
 func api(rsp http.ResponseWriter, req *http.Request){
 	rsp.Header().Set("Content-Type", "application/json; charset=utf-8")
 	rsp.WriteHeader(200)
@@ -25,4 +25,4 @@ func main() {
 	if err != nil{
 		log.Fatal(err)
 	}
-  }
+  }**/
